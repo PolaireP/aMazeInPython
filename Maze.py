@@ -88,6 +88,7 @@ class Maze:
 
         return txt
     
+
     def add_wall(self, c1, c2):
         # Facultatif : on teste si les sommets sont bien dans le labyrinthe
         assert 0 <= c1[0] < self.height and \
@@ -101,7 +102,14 @@ class Maze:
         if c1 in self.neighbors[c2]:      # Si c3 est dans les voisines de c2
             self.neighbors[c2].remove(c1) # on le retire
     
+
     def remove_wall(self, c1, c2):
+        """Enlève un mur entre les cellules c1 et c2
+
+        Args:
+            c1 (_type_): Cellule 1
+            c2 (_type_): Cellule 2
+        """
         # Test si les sommets sont dans le labyrinthe
         assert 0 <= c1[0] < self.height and \
             0 <= c1[1] < self.width and \
@@ -112,20 +120,51 @@ class Maze:
             self.neighbors[c2].add(c1)
         if c2 not in self.neighbors[c1]:
             self.neighbors[c1].add(c2)
+
+
+    def get_cells(self):
+        """Renvoi toutes les cellules du labyrinthe
+
+        Returns:
+            List: cellules du labyrinthe
+        """
+
+        L = []
+
+        for i in range(0, self.height-1):
+            for j in range(0, self.width-1):
+                L.append((i, j))
+        
+        return L
     
+
     def get_walls(self):
+        """Récupère la liste des murs du labyrinthe
+
+        Returns:
+            list: list des murs du labyrinthe
+        """
         walls = []
+        # Pour chaque ligne
         for i in range(self.height) :
+                # Pour chaque cellule de la ligne
                 for j in range(self.width):
+                    # Vérifier si il y'as un mur à droite et en bas de la cellule
                     if i + 1 < self.height and (i+1, j) not in self.neighbors[(i, j)] :
                         walls.append([(i,j), (i+1, j)])
                     if j + 1 < self.width and (i, j+1) not in self.neighbors[(i, j)] :
                         walls.append([(i,j), (i, j+1)])
         return walls
     
+
     def empty(self):
+        """Supprime tous les murs d'un labyrinthe
+        """
+        # Pour chaque ligne
         for i in range(self.height) :
+                # Pour chaque cellule
                 for j in range(self.width):
+                    # Supprimer les murs si ils sont dans le labyrinthe
                     if i - 1 >= 0 :
                         self.remove_wall((i, j), (i-1, j))
                     if i + 1 < self.height :
@@ -135,9 +174,15 @@ class Maze:
                     if j + 1 < self.width :
                         self.remove_wall((i, j), (i, j+1))
     
+
     def fill(self):
+        """Remplis le labyrinthe de murs
+        """
+        # Pour chaque ligne
         for i in range(self.height) :
+                # Pour chaque cellule de la ligne
                 for j in range(self.width):
+                    # Ajouter chaque mur s'ils ne dépassent pas du labyrinthe
                     if i - 1 >= 0 :
                         self.add_wall((i,j), (i-1, j))
                     if i + 1 < self.height :
@@ -146,3 +191,51 @@ class Maze:
                         self.add_wall((i,j), (i, j-1))
                     if j + 1 < self.width :
                         self.add_wall((i,j), (i, j+1))
+    
+    def get_contiguous_cells(self, c):
+        """Renvoi les voisins touchant la cellule
+
+        Args:
+            c (tuple): Cellule
+
+        Returns:
+            list: cellules touchant la cellule c
+        """
+        assert 0 <= c[0] < self.height and \
+            0 <= c[1] < self.width, \
+            f"La cellule {c} est en dehors du labyrinthe"
+        
+        cells = []
+
+        if c[0] - 1 >= 0 :
+            cells.append((c[0]-1, c[1]))
+        if c[0] + 1 < self.width :
+            cells.append((c[0]+1, c[1]))
+        if c[1] - 1 >= 0 :
+            cells.append((c[0], c[1]-1))
+        if c[1] + 1 < self.width :
+            cells.append((c[0], c[1]+1))
+        
+        return cells
+    
+
+    def get_reachable_cells(self, c):
+        """Récupère les cellules reliées à c
+
+        Args:
+            c (tuple): cellule
+
+        Returns:
+            list: cellules reliées
+        """
+
+        assert 0 <= c[0] < self.height and \
+            0 <= c[1] < self.width, \
+            f"La cellule {c} est en dehors du labyrinthe"
+        
+        cells = []
+
+        for cellule in self.neighbors[c] :
+            cells.append(cellule)
+        
+        return cells
