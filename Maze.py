@@ -118,22 +118,22 @@ class Maze:
         for i in range(self.height) :
                 for j in range(self.width):
                     if i - 1 >= 0 :
-                        self.neighbors[(i,j)].remove((i-1, j))
+                        self.remove_wall((i, j), (i-1, j))
                     if i + 1 < self.height :
-                        self.neighbors[(i,j)].remove((i+1, j))
+                        self.remove_wall((i, j), (i+1, j))
                     if j - 1 >= 0 :
-                        self.neighbors[(i,j)].remove((i, j-1))
+                        self.remove_wall((i, j), (i, j-1))
                     if j + 1 < self.width :
-                        self.neighbors[(i,j)].remove((i, j+1))
+                        self.remove_wall((i, j), (i, j+1))
     
     def empty(self):
         for i in range(self.height) :
                 for j in range(self.width):
                     if i - 1 >= 0 :
-                        self.neighbors[(i,j)].add((i-1, j))
+                        self.add_wall((i,j), (i-1, j))
                     if i + 1 < self.height :
-                        self.neighbors[(i,j)].add((i+1, j))
+                        self.add_wall((i,j), (i+1, j))
                     if j - 1 >= 0 :
-                        self.neighbors[(i,j)].add((i, j-1))
+                        self.add_wall((i,j), (i, j-1))
                     if j + 1 < self.width :
-                        self.neighbors[(i,j)].add((i, j+1))
+                        self.add_wall((i,j), (i, j+1))
