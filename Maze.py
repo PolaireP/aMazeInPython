@@ -18,7 +18,6 @@ class Maze:
         self.width     = width
         self.empty     = empty
         self.neighbors = {(i,j): set() for i in range(height) for j in range (width)}
-        print("Feur")
 
         if self.empty :
             for i in range(self.height) :
@@ -114,3 +113,27 @@ class Maze:
             self.neighbors[c2].remove(c1)
         if c2 in self.neighbors[c1]:
             self.neighbors[c1].remove(c2)
+    
+    def fill(self):
+        for i in range(self.height) :
+                for j in range(self.width):
+                    if i - 1 >= 0 :
+                        self.neighbors[(i,j)].remove((i-1, j))
+                    if i + 1 < self.height :
+                        self.neighbors[(i,j)].remove((i+1, j))
+                    if j - 1 >= 0 :
+                        self.neighbors[(i,j)].remove((i, j-1))
+                    if j + 1 < self.width :
+                        self.neighbors[(i,j)].remove((i, j+1))
+    
+    def empty(self):
+        for i in range(self.height) :
+                for j in range(self.width):
+                    if i - 1 >= 0 :
+                        self.neighbors[(i,j)].add((i-1, j))
+                    if i + 1 < self.height :
+                        self.neighbors[(i,j)].add((i+1, j))
+                    if j - 1 >= 0 :
+                        self.neighbors[(i,j)].add((i, j-1))
+                    if j + 1 < self.width :
+                        self.neighbors[(i,j)].add((i, j+1))
