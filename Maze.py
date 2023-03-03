@@ -26,13 +26,13 @@ class Maze:
         if self.empty :
             for i in range(height) :
                 for j in range(width):
-                    if i - 1 >= 0 :
+                    if i > 0 :
                         self.neighbors[(i,j)].add((i-1, j))
-                    if i + 1 < self.height :
+                    if i < self.height :
                         self.neighbors[(i,j)].add((i+1, j))
-                    if j - 1 >= 0 :
+                    if j > 0 :
                         self.neighbors[(i,j)].add((i, j-1))
-                    if j + 1 < self.width :
+                    if j < self.width :
                         self.neighbors[(i,j)].add((i, j+1))
 
     def info(self):
