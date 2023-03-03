@@ -16,10 +16,9 @@ class Maze:
         """
         self.height    = height
         self.width     = width
-        self.empty     = empty
         self.neighbors = {(i,j): set() for i in range(height) for j in range (width)}
 
-        if self.empty :
+        if empty :
             for i in range(self.height) :
                 for j in range(self.width):
                     if i - 1 >= 0 :
@@ -109,12 +108,22 @@ class Maze:
             0 <= c2[0] < self.height and \
             0 <= c2[1] < self.width, \
             f"Erreur lors de la suppression d'un mur entre {c1} et {c2} : les coordonnées de sont pas compatibles avec les dimensions du labyrinthe"
-        if c1 in self.neighbors[c2]:
-            self.neighbors[c2].remove(c1)
-        if c2 in self.neighbors[c1]:
-            self.neighbors[c1].remove(c2)
+        if c1 not in self.neighbors[c2]:
+            self.neighbors[c2].add(c1)
+        if c2 not in self.neighbors[c1]:
+            self.neighbors[c1].add(c2)
     
-    def fill(self):
+    def get_walls(self):
+        walls = []
+        for i in range(self.height) :
+                for j in range(self.width):
+                    if i + 1 < self.height and (i+1, j) not in self.neighbors[(i, j)] :
+                        walls.append([(i,j), (i+1, j)])
+                    if j + 1 < self.width and (i, j+1) not in self.neighbors[(i, j)] :
+                        walls.append([(i,j), (i, j+1)])
+        return walls
+    
+    def empty(self):
         for i in range(self.height) :
                 for j in range(self.width):
                     if i - 1 >= 0 :
@@ -126,7 +135,7 @@ class Maze:
                     if j + 1 < self.width :
                         self.remove_wall((i, j), (i, j+1))
     
-    def empty(self):
+    def fill(self):
         for i in range(self.height) :
                 for j in range(self.width):
                     if i - 1 >= 0 :
