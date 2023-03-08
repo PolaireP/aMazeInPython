@@ -131,8 +131,8 @@ class Maze:
 
         L = []
 
-        for i in range(0, self.height-1):
-            for j in range(0, self.width-1):
+        for i in range(0, self.height):
+            for j in range(0, self.width):
                 L.append((i, j))
         
         return L
