@@ -1,3 +1,5 @@
+from random import randint
+
 class Maze:
     """
     Classe Labyrinthe
@@ -234,3 +236,42 @@ class Maze:
             f"La cellule {c} est en dehors du labyrinthe"
         
         return list(self.neighbors[c])
+
+
+    @classmethod
+    def gen_btree(cls, h, w):
+        """
+        Algorithme de génération de labyrinthe par arbre binaire
+        """
+        # Initialisation d'un labyrinthe plein
+        maze = cls(h, w, empty = False)
+        
+        # Pour chaque cellule du labyrinthe :
+        for cell in maze.get_cells():
+            cell_EST = (cell[0], cell[1]+1)
+            cell_SUD = (cell[0]+1, cell[1])
+            mur_EST = [cell, (cell[0], cell[1]+1)]
+            mur_SUD = [cell, (cell[0]+1, cell[1])]
+            liste_mur = maze.get_walls()
+            
+            # Si le mur entre la cellule courante et la cellule EST existe 
+            # OU si le mur entre la cellule courante et la cellule SUD existe
+            if mur_EST in liste_mur or mur_SUD in liste_mur:
+
+                # Si le mur entre la cellule courante et la cellule EST existe 
+                # ET si le mur entre la cellule courante et la cellule SUD existe
+                # Alors supprimer aléatoirement le mur EST ou le mur SUD
+
+                if mur_EST in liste_mur and mur_SUD in liste_mur:
+                    maze.remove_wall(cell, [cell_EST, cell_SUD][randint(0,1)])
+
+                # Sinon si le mur entre la cellule courante et la cellule EST existe
+                # Alors supprimer le mur EST
+                elif mur_EST in liste_mur:
+                    maze.remove_wall(cell, cell_EST)
+
+                # Sinon supprimer le mur SUD
+                else:
+                    maze.remove_wall(cell, cell_SUD)
+        
+        return maze
