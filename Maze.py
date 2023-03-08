@@ -233,9 +233,4 @@ class Maze:
             0 <= c[1] < self.width, \
             f"La cellule {c} est en dehors du labyrinthe"
         
-        cells = []
-
-        for cellule in self.neighbors[c] :
-            cells.append(cellule)
-        
-        return cells
+        return list(self.neighbors[c])
