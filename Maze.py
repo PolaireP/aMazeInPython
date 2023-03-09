@@ -275,3 +275,49 @@ class Maze:
                     maze.remove_wall(cell, cell_SUD)
         
         return maze
+
+
+    @classmethod
+    def gen_sidewinder(cls, h, w):
+        """
+        Algorithme de génération sidewinder
+        """
+        # Initialisation : création d’un labyrinthe plein
+        maze = cls(h, w, empty = False)
+        
+        # Pour i allant de 0 à hauteur-2 :
+        for i in range(h-1):
+            # Initialiser une variable séquence comme liste vide
+            sequence = []
+            
+            # Pour j allant de 0 à largeur-2 :
+            for j in range(w-1):
+                # Ajouter la cellule (i, j) à la séquence
+                sequence.append((i,j))
+                
+                # Tirer à pile ou face :
+                # Si c’est pile : Casser le mur EST de la cellule (i, j)
+                if randint(0,1) == 1:
+                    maze.remove_wall((i,j), (i,j+1))
+                
+                # Si c’est face :
+                else:
+                    # Casser le mur SUD d’une des cellules (choisie au hasard) qui 
+                    # constituent le séquence qui vient d’être terminée.
+                    cellule_aleatoire = sequence[randint(0, len(sequence)-1)]
+                    maze.remove_wall(cellule_aleatoire, (cellule_aleatoire[0]+1, cellule_aleatoire[1]))
+                    # Réinitialiser la séquence à une liste vide
+                    sequence = []
+            
+            # Ajouter la dernière cellule à la séquence
+            sequence.append((i,j+1))
+            
+            # Tirer une cellule au sort dans la séquence et casser son mur SUD
+            cellule_aleatoire = sequence[randint(0, len(sequence)-1)]
+            maze.remove_wall(cellule_aleatoire, (cellule_aleatoire[0]+1, cellule_aleatoire[1]))
+        
+        # Casser tous les murs EST de la dernière ligne
+        for k in range(w-1):
+            maze.remove_wall((h-1, k), (h-1, k+1))
+            
+        return maze
