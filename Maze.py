@@ -356,3 +356,69 @@ class Maze:
                         label[cell] = label[mur[0]]
         
         return maze
+    
+
+    @classmethod
+    def gen_exploration(cls, h, w):
+        """Generation par exploration exhaustive
+
+        Args:
+            h (int): Hauteur du labyrinthe
+            w (int): Largeur du labyrinthe
+
+        Returns:
+            Maze: Labyrinthe généré
+        """
+
+        # Initialisation du labyrinthe
+        maze = cls(h, w, empty = False)
+
+        # Choix de la première cellule
+        firstCell = (randint(0, h-1), randint(0, w-1))
+
+        # Création de l'ensemble des cellules visité et ajout de la première cellule
+        visitedCells = set()
+        visitedCells.add(firstCell)
+
+        # Création de la pile avec la première cellule
+        pile = [firstCell]
+
+        # Tant que la pile n'est pas vide
+        while len(pile) != 0 :
+
+            # Prendre la cellule en haut de la pile
+            actualCell = pile.pop(len(pile)-1)
+
+            # Création du paramètre pour vérifier si des voisins sont déjà visités
+            hasUnvisitedContigous = False
+
+            # Récupération des cellules voisines de actualCell
+            voisines = maze.get_contiguous_cells(actualCell)
+
+            # Pour chaque cellule voisine
+            for cellule in  voisines:
+
+                # Vérifier si elle n'est pas visité
+                if cellule not in visitedCells :
+                    # Changer le paramètre a vrai
+                    hasUnvisitedContigous = True
+            
+            # Si des voisins ne sont pas visités
+            if hasUnvisitedContigous :
+
+                #Réajouter actualCell a la pile
+                pile.append(actualCell)
+
+                # Récupérer un voisin non visité
+                newCell = voisines[randint(0, len(voisines)-1)]
+                while newCell in visitedCells :
+                    newCell = voisines[randint(0, len(voisines)-1)]
+
+                # Supprimer le mur entre actualCell et son voisin non visité
+                maze.remove_wall(actualCell, newCell)
+                
+                # Ajouter le voisin aux cellules visités et au haut de la pile
+                visitedCells.add(newCell)
+                pile.append(newCell)
+                
+        return maze
