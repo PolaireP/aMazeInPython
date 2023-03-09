@@ -422,3 +422,65 @@ class Maze:
                 pile.append(newCell)
                 
         return maze
+
+
+
+    @classmethod
+    def gen_wilson(cls, h, w):
+        """Generation par algorithme wilson
+
+        Args:
+            h (int): Hauteur du labyrinthe
+            w (int): Largeur du labyrinthe
+
+        Returns:
+            Maze: Labyrinthe généré
+        """
+        # Initialisation du labyrinthe
+        maze = cls(h, w, empty = False)
+
+        # Choix de la première cellule
+        firstCell = (randint(0, h-1), randint(0, w-1))
+
+        # Création de l'ensemble des cellules visité et ajout de la première cellule et récupération de toutes les cellules
+        visitedCells = set()
+        visitedCells.add(firstCell)
+        mazeCells = maze.get_cells()
+
+        # Tant que toutes les cellules ne sont pas marquées
+        while len(maze.get_cells()) != len(visitedCells):
+            
+            # Prendre une cellule au hasard qui n'est pas marqué
+            actualCell = mazeCells[randint(0, len(mazeCells)-1)]
+            while actualCell in visitedCells :
+                actualCell = mazeCells[randint(0, len(mazeCells)-1)]
+            
+            # Initialisation des étapes et du paramètre de marquage
+            etapes = [actualCell]
+            hasVisited = False
+
+            # Tant que on ne tombe pas sur une cellule marquée
+            while hasVisited == False :
+
+                # Récupérer et piocher une cellule voisine au hasard
+                voisines = maze.get_contiguous_cells(etapes[len(etapes)-1])
+                randomVoisine = voisines[randint(0, len(voisines)-1)]
+                
+                # Si la voisine est déjà dans étape (boucle), enlever l'étape d'avant
+                if randomVoisine in etapes :
+                    etapes.pop(len(etapes)-1)
+
+                # Sinon ajouter la voisine a étape et vérifier si elle n'est pas visité
+                # Dans ce cas, change le paramètre
+                else :
+                    etapes.append(randomVoisine)
+                    if randomVoisine in visitedCells :
+                        hasVisited = True
+            
+            # Ajout de chaque cellule des étapes comme étant visitée, et suppression des murs
+            # entre chaque cellule
+            for i in range(len(etapes)-1):
+                visitedCells.add(etapes[i])
+                maze.remove_wall(etapes[i], etapes[i+1])
+        
+        return maze
