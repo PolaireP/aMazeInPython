@@ -1,4 +1,4 @@
-from random import randint
+from random import randint, shuffle
 
 class Maze:
     """
@@ -320,4 +320,39 @@ class Maze:
         for k in range(w-1):
             maze.remove_wall((h-1, k), (h-1, k+1))
             
+        return maze
+    
+
+    @classmethod
+    def gen_fusion(cls, h, w):
+        """
+        Algorithme de fusion de chemin
+        """
+        # Initialisation : création d’un labyrinthe plein
+        maze = cls(h, w, empty = False)
+        
+        # On labélise les cellules de 1 à n
+        label = {}
+        liste_cellule = maze.get_cells()
+        for i in range(1, h*w+1):
+            label[liste_cellule[i-1]] = i
+        
+        # On extrait la liste de tous les murs et on les permute aléatoirement
+        liste_murs = maze.get_walls()
+        shuffle(liste_murs)
+        
+        # Pour chaque mur de la liste :
+        for mur in liste_murs:
+            # Si les deux cellules séparées par le mur n’ont pas le même label :
+            if label[mur[0]] != label[mur[1]]:
+                # casser le mur
+                maze.remove_wall(mur[0], mur[1])
+                
+                # affecter le label de l’une des deux cellules, à l’autre,
+                # et à toutes celles qui ont le même label que la deuxième
+                label_temp = label[mur[1]]
+                for cell in liste_cellule:
+                    if label[cell] == label_temp:
+                        label[cell] = label[mur[0]]
+        
         return maze
