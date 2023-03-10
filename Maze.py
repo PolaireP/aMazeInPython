@@ -631,7 +631,7 @@ class Maze:
         
         return chemin
 
-    def solve_hrh(self, start, stop):
+    def solve_rhr(self, start, stop):
         """Résolution en suivant le mur droit
 
         Args:
