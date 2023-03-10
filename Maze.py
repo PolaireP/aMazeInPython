@@ -484,3 +484,149 @@ class Maze:
                 maze.remove_wall(etapes[i], etapes[i+1])
         
         return maze
+
+
+    def overlay(self, content=None):
+        """
+        Rendu en mode texte, sur la sortie standard, \
+        d'un labyrinthe avec du contenu dans les cellules
+        Argument:
+            content (dict) : dictionnaire tq content[cell] contient le caractère à afficher au milieu de la cellule
+        Retour:
+            string
+        """
+        if content is None:
+            content = {(i,j):' ' for i in range(self.height) for j in range(self.width)}
+        else:
+            # Python >=3.9
+            #content = content | {(i, j): ' ' for i in range(
+            #    self.height) for j in range(self.width) if (i,j) not in content}
+            # Python <3.9
+            new_content = {(i, j): ' ' for i in range(self.height) for j in range(self.width) if (i,j) not in content}
+            content = {**content, **new_content}
+        txt = r""
+        # Première ligne
+        txt += "┏"
+        for j in range(self.width-1):
+            txt += "━━━┳"
+        txt += "━━━┓\n"
+        txt += "┃"
+        for j in range(self.width-1):
+            txt += " "+content[(0,j)]+" ┃" if (0,j+1) not in self.neighbors[(0,j)] else " "+content[(0,j)]+"  "
+        txt += " "+content[(0,self.width-1)]+" ┃\n"
+        # Lignes normales
+        for i in range(self.height-1):
+            txt += "┣"
+            for j in range(self.width-1):
+                txt += "━━━╋" if (i+1,j) not in self.neighbors[(i,j)] else "   ╋"
+            txt += "━━━┫\n" if (i+1,self.width-1) not in self.neighbors[(i,self.width-1)] else "   ┫\n"
+            txt += "┃"
+            for j in range(self.width):
+                txt += " "+content[(i+1,j)]+" ┃" if (i+1,j+1) not in self.neighbors[(i+1,j)] else " "+content[(i+1,j)]+"  "
+            txt += "\n"
+        # Bas du tableau
+        txt += "┗"
+        for i in range(self.width-1):
+            txt += "━━━┻"
+        txt += "━━━┛\n"
+        return txt
+    
+    
+    def solve_dfs(self, start, stop):
+        """
+        Algorithme de résolution parcours en profondeur
+        """
+        
+        # Parcours du graphe jusqu’à ce qu’on trouve stop
+        # Placer start dans la pile et marquer start
+        pile = [start]
+        visite = []
+        # Mémoriser l’élément prédécesseur de start comme étant start
+        pred = {start : start}
+        
+        # Tant qu’il reste des cellules non-marquées :
+        while len(pile) > 0:
+            # Prendre la première cellule et la retirer de la pile (appelons c, cette cellule)
+            c = pile[0]
+            del pile[0]
+            # Si c correspond à A :
+            if c == stop:
+                # C’est terminé, on a trouvé un chemin vers la cellule de destination
+                continue
+            # Sinon :
+            else:
+                # Pour chaque voisine de c :
+                for voisin in self.get_reachable_cells(c):
+                    # Si elle n’est pas marquée :
+                    if voisin not in visite:
+                        # On la marque
+                        visite.append(voisin)
+                        # La mettre dans la pile
+                        pile = [voisin] + pile
+                        # Mémoriser son prédécesseur comme étant c
+                        pred[voisin] = c
+        
+        # Reconstruction du chemin à partir des prédécesseurs
+        chemin = []
+        # Initialiser c à stop
+        c = stop
+        # Tant que c n’est pas start :
+        while c != start:
+            # ajouter c au chemin
+            chemin.append(c)
+            # mettre le prédécesseur de c dans c
+            c = pred[c]
+        # Ajouter start au chemin
+        chemin.append(start)
+        
+        return chemin
+    
+    
+    def solve_bfs(self, start, stop):
+        """
+        Algorithme de résolution parcours en largeur
+        """
+        
+        # Parcours du graphe jusqu’à ce qu’on trouve stop
+        # Placer start dans la file et marquer start
+        file = [start]
+        visite = []
+        # Mémoriser l’élément prédécesseur de start comme étant start
+        pred = {start : start}
+        
+        # Tant qu’il reste des cellules non-marquées :
+        while len(file) > 0:
+            # Prendre la première cellule et la retirer de la file (appelons c, cette cellule)
+            c = file[0]
+            del file[0]
+            # Si c correspond à A :
+            if c == stop:
+                # C’est terminé, on a trouvé un chemin vers la cellule de destination
+                continue
+            # Sinon :
+            else:
+                # Pour chaque voisine de c :
+                for voisin in self.get_reachable_cells(c):
+                    # Si elle n’est pas marquée :
+                    if voisin not in visite:
+                            # On la marque
+                            visite.append(voisin)
+                            # La mettre dans la file
+                            file.append(voisin)
+                            # Mémoriser son prédécesseur comme étant c
+                            pred[voisin] = c
+        
+        # Reconstruction du chemin à partir des prédécesseurs
+        chemin = []
+        # Initialiser c à stop
+        c = stop
+        # Tant que c n’est pas start :
+        while c != start:
+            # ajouter c au chemin
+            chemin.append(c)
+            # mettre le prédécesseur de c dans c
+            c = pred[c]
+        # Ajouter start au chemin
+        chemin.append(start)
+        
+        return chemin
