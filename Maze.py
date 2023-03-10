@@ -690,3 +690,55 @@ class Maze:
                 actualCell = backCell
 
         return etapes
+
+
+    def distance_geo(self, start, stop):
+        # Parcours du graphe jusqu’à ce qu’on trouve stop
+        # Placer start dans la pile et marquer start
+        pile = [start]
+        visite = []
+        # Mémoriser l’élément prédécesseur de start comme étant start
+        pred = {start : start}
+        
+        # Tant qu’il reste des cellules non-marquées :
+        while len(pile) > 0:
+            # Prendre la première cellule et la retirer de la pile (appelons c, cette cellule)
+            c = pile[0]
+            del pile[0]
+            # Si c correspond à A :
+            if c == stop:
+                # C’est terminé, on a trouvé un chemin vers la cellule de destination
+                continue
+            # Sinon :
+            else:
+                # Pour chaque voisine de c :
+                for voisin in self.get_reachable_cells(c):
+                    # Si elle n’est pas marquée :
+                    if voisin not in visite:
+                        # On la marque
+                        visite.append(voisin)
+                        # La mettre dans la pile
+                        pile = [voisin] + pile
+                        # Mémoriser son prédécesseur comme étant c
+                        pred[voisin] = c
+        
+        # Reconstruction du chemin à partir des prédécesseurs
+        chemin = []
+        # Initialiser c à stop
+        c = stop
+        # Tant que c n’est pas start :
+        while c != start:
+            # ajouter c au chemin
+            chemin.append(c)
+            # mettre le prédécesseur de c dans c
+            c = pred[c]
+        # Ajouter start au chemin
+        chemin.append(start)
+        
+        return len(chemin)
+    
+    
+    def distance_man(self, c1, c2):
+        # Calcul distance de Manhattan :
+        # d(A,B) = |Xb - Xa| + |Yb - Ya|
+        return abs(c2[0] - c1[0]) + abs(c2[1] - c1[1])
