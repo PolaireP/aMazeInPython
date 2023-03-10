@@ -688,8 +688,11 @@ class Maze:
             else :
                 etapes.append((actualCell, backCell))
                 actualCell = backCell
+        finalCells = []
+        for elem in etapes :
+            finalCells.append(elem[0])
 
-        return etapes
+        return finalCells
 
 
     def distance_geo(self, start, stop):
