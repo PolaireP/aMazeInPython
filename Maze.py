@@ -484,3 +484,213 @@ class Maze:
                 maze.remove_wall(etapes[i], etapes[i+1])
         
         return maze
+
+
+    def overlay(self, content=None):
+        """
+        Rendu en mode texte, sur la sortie standard, \
+        d'un labyrinthe avec du contenu dans les cellules
+        Argument:
+            content (dict) : dictionnaire tq content[cell] contient le caractère à afficher au milieu de la cellule
+        Retour:
+            string
+        """
+        if content is None:
+            content = {(i,j):' ' for i in range(self.height) for j in range(self.width)}
+        else:
+            # Python >=3.9
+            #content = content | {(i, j): ' ' for i in range(
+            #    self.height) for j in range(self.width) if (i,j) not in content}
+            # Python <3.9
+            new_content = {(i, j): ' ' for i in range(self.height) for j in range(self.width) if (i,j) not in content}
+            content = {**content, **new_content}
+        txt = r""
+        # Première ligne
+        txt += "┏"
+        for j in range(self.width-1):
+            txt += "━━━┳"
+        txt += "━━━┓\n"
+        txt += "┃"
+        for j in range(self.width-1):
+            txt += " "+content[(0,j)]+" ┃" if (0,j+1) not in self.neighbors[(0,j)] else " "+content[(0,j)]+"  "
+        txt += " "+content[(0,self.width-1)]+" ┃\n"
+        # Lignes normales
+        for i in range(self.height-1):
+            txt += "┣"
+            for j in range(self.width-1):
+                txt += "━━━╋" if (i+1,j) not in self.neighbors[(i,j)] else "   ╋"
+            txt += "━━━┫\n" if (i+1,self.width-1) not in self.neighbors[(i,self.width-1)] else "   ┫\n"
+            txt += "┃"
+            for j in range(self.width):
+                txt += " "+content[(i+1,j)]+" ┃" if (i+1,j+1) not in self.neighbors[(i+1,j)] else " "+content[(i+1,j)]+"  "
+            txt += "\n"
+        # Bas du tableau
+        txt += "┗"
+        for i in range(self.width-1):
+            txt += "━━━┻"
+        txt += "━━━┛\n"
+        return txt
+    
+    
+    def solve_dfs(self, start, stop):
+        """
+        Algorithme de résolution parcours en profondeur
+        """
+        
+        # Parcours du graphe jusqu’à ce qu’on trouve stop
+        # Placer start dans la pile et marquer start
+        pile = [start]
+        visite = []
+        # Mémoriser l’élément prédécesseur de start comme étant start
+        pred = {start : start}
+        
+        # Tant qu’il reste des cellules non-marquées :
+        while len(pile) > 0:
+            # Prendre la première cellule et la retirer de la pile (appelons c, cette cellule)
+            c = pile[0]
+            del pile[0]
+            # Si c correspond à A :
+            if c == stop:
+                # C’est terminé, on a trouvé un chemin vers la cellule de destination
+                continue
+            # Sinon :
+            else:
+                # Pour chaque voisine de c :
+                for voisin in self.get_reachable_cells(c):
+                    # Si elle n’est pas marquée :
+                    if voisin not in visite:
+                        # On la marque
+                        visite.append(voisin)
+                        # La mettre dans la pile
+                        pile = [voisin] + pile
+                        # Mémoriser son prédécesseur comme étant c
+                        pred[voisin] = c
+        
+        # Reconstruction du chemin à partir des prédécesseurs
+        chemin = []
+        # Initialiser c à stop
+        c = stop
+        # Tant que c n’est pas start :
+        while c != start:
+            # ajouter c au chemin
+            chemin.append(c)
+            # mettre le prédécesseur de c dans c
+            c = pred[c]
+        # Ajouter start au chemin
+        chemin.append(start)
+        
+        return chemin
+    
+    
+    def solve_bfs(self, start, stop):
+        """
+        Algorithme de résolution parcours en largeur
+        """
+        
+        # Parcours du graphe jusqu’à ce qu’on trouve stop
+        # Placer start dans la file et marquer start
+        file = [start]
+        visite = []
+        # Mémoriser l’élément prédécesseur de start comme étant start
+        pred = {start : start}
+        
+        # Tant qu’il reste des cellules non-marquées :
+        while len(file) > 0:
+            # Prendre la première cellule et la retirer de la file (appelons c, cette cellule)
+            c = file[0]
+            del file[0]
+            # Si c correspond à A :
+            if c == stop:
+                # C’est terminé, on a trouvé un chemin vers la cellule de destination
+                continue
+            # Sinon :
+            else:
+                # Pour chaque voisine de c :
+                for voisin in self.get_reachable_cells(c):
+                    # Si elle n’est pas marquée :
+                    if voisin not in visite:
+                            # On la marque
+                            visite.append(voisin)
+                            # La mettre dans la file
+                            file.append(voisin)
+                            # Mémoriser son prédécesseur comme étant c
+                            pred[voisin] = c
+        
+        # Reconstruction du chemin à partir des prédécesseurs
+        chemin = []
+        # Initialiser c à stop
+        c = stop
+        # Tant que c n’est pas start :
+        while c != start:
+            # ajouter c au chemin
+            chemin.append(c)
+            # mettre le prédécesseur de c dans c
+            c = pred[c]
+        # Ajouter start au chemin
+        chemin.append(start)
+        
+        return chemin
+
+    def solve_hrh(self, start, stop):
+        """Résolution en suivant le mur droit
+
+        Args:
+            start (tuple): Cellule de départ
+            stop (tuple): Cellule d'arrivée
+
+        Returns:
+            List: liste de toutes les étapes menant à l'arrivée
+        """
+        
+        if start not in self.get_cells() or stop not in self.get_cells():
+            raise ValueError("L'une des cellules n'est pas dans le labyrinthe")
+
+        actualCell = self.get_reachable_cells(start)[0]
+        etapes = [(start, actualCell)]
+        
+        # Tant que la cellule d'arrêt n'est pas rencontrée
+        while actualCell != stop :
+
+            # Récupérer la cellule avant la cellule actuelle
+            cellBefore = etapes[len(etapes)-1][0]
+            # Calculer le sens d'avancement entre la cellule actuelle et la cellule la précédent
+            advance = (actualCell[0] - cellBefore[0], actualCell[1] - cellBefore[1])
+
+            # On calcul le sens pour trouver la cellule a droite selon le sens choisis
+            if advance[0] == 1 or advance[0] == -1 in advance :
+                advanceRight = ( -advance[1], - advance[0])
+            else :
+                advanceRight = ( advance[1], advance[0])
+
+            # On initialise la cellule droite et avant
+            rightCell = (advanceRight[0] + actualCell[0], advanceRight[1] + actualCell[1])
+            frontCell = (advance[0] + actualCell[0], advance[1] + actualCell[1])
+            
+            # Quand on peut aller a droite, on ajoute le chemin dans étape et on met la cellule actuel a droite
+            if rightCell in self.get_reachable_cells(actualCell):
+                etapes.append((actualCell, rightCell))
+                actualCell = rightCell
+            
+            
+            ## Sinon si on peut aller devant, on ajoute le chemin dans étape et on met la cellule actuel devant
+            elif frontCell in self.get_reachable_cells(actualCell):
+                etapes.append((actualCell, frontCell))
+                actualCell = frontCell
+
+            # Sinon, on regarde si on test les deux autres possibilitées
+            else :
+
+                leftCell = (-advanceRight[0] + actualCell[0], -advanceRight[1] + actualCell[1])
+                backCell = (-advance[0] + actualCell[0], -advance[1] + actualCell[1])
+
+                # Si on peut aller à gauche, on ajoute le chemin dans étape, et on met la cellule actuel à gauche
+                if leftCell in self.get_reachable_cells(actualCell) :
+                    etapes.append((actualCell, leftCell))
+                    actualCell = leftCell
+
+                # Sinon on ajoute le chemin de retour sur nos pas dans étape et on passe la cellule précédente comme actuelle
+                else :
+                    etapes.append((actualCell, backCell))
+                    actualCell = backCell
+
+        return etapes
