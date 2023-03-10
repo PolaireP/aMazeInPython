@@ -665,6 +665,8 @@ class Maze:
             # On initialise la cellule droite et avant
             rightCell = (advanceRight[0] + actualCell[0], advanceRight[1] + actualCell[1])
             frontCell = (advance[0] + actualCell[0], advance[1] + actualCell[1])
+            leftCell = (-advanceRight[0] + actualCell[0], -advanceRight[1] + actualCell[1])
+            backCell = (-advance[0] + actualCell[0], -advance[1] + actualCell[1])
             
             # Quand on peut aller a droite, on ajoute le chemin dans étape et on met la cellule actuel a droite
             if rightCell in self.get_reachable_cells(actualCell):
@@ -677,20 +679,14 @@ class Maze:
                 etapes.append((actualCell, frontCell))
                 actualCell = frontCell
 
-            # Sinon, on regarde si on test les deux autres possibilitées
-            else :
-
-                leftCell = (-advanceRight[0] + actualCell[0], -advanceRight[1] + actualCell[1])
-                backCell = (-advance[0] + actualCell[0], -advance[1] + actualCell[1])
-
-                # Si on peut aller à gauche, on ajoute le chemin dans étape, et on met la cellule actuel à gauche
-                if leftCell in self.get_reachable_cells(actualCell) :
+            # Sinon si on peut accéder à la cellule gauche, on ajoute le chemin à étape et on met la cellule actuelle a gauche
+            elif leftCell in self.get_reachable_cells(actualCell) :
                     etapes.append((actualCell, leftCell))
                     actualCell = leftCell
 
-                # Sinon on ajoute le chemin de retour sur nos pas dans étape et on passe la cellule précédente comme actuelle
-                else :
-                    etapes.append((actualCell, backCell))
-                    actualCell = backCell
+            # Sinon on ajoute le chemin de retour sur nos pas dans étape et on passe la cellule précédente comme actuelle
+            else :
+                etapes.append((actualCell, backCell))
+                actualCell = backCell
 
         return etapes
