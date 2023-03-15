@@ -32,7 +32,7 @@ def getBestScore():
         str : Meilleur score enregistré
     """
     if gameData["bestScore"] == None :
-        bestScore = "Aucun score enregistré"
+        bestScore = "Aucun"
     else :
         bestScore = str(gameData["bestScore"])
     
