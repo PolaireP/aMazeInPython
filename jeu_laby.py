@@ -1,4 +1,5 @@
 import pygame, sys, random, time, os
+from data import *
 from Maze import Maze
 
 def generateModel(laby, height, width):
@@ -57,7 +58,7 @@ clock = pygame.time.Clock()
 # Initialisation du chronomètre
 start_time = time.time()
 # Estimation du temps
-duration = (laby.distance_geo((0,0), (dimension-1, dimension-1))) + 2
+duration = (laby.distance_geo((0,0), (dimension-1, dimension-1))) * 1.5
 
 screen_width = 700
 screen_height = 700
@@ -66,7 +67,8 @@ pygame.display.set_caption('Laby')
 
 block_size = 30
 
-score_font = pygame.font.SysFont("roboto", 50)
+score_font = pygame.font.SysFont("roboto", 60)
+meilleur_score_font = pygame.font.SysFont("roboto", 40)
 indications_font = pygame.font.SysFont("roboto", 20)
 game_over_font = pygame.font.SysFont("roboto", 100)
 
@@ -171,28 +173,31 @@ while not game_over:
 
         # Reset chrono
         start_time = time.time()
-        duration = (laby.distance_geo((0,0), (dimension-1, dimension-1)) * 2) + 2
+        duration = (laby.distance_geo((0,0), (dimension-1, dimension-1))) + 2
 
         # Nouvelle position joueur
         player_size = block_size / 2
         player_start = ((maze_x + player_size/2) + block_size, (maze_y + player_size/2) + block_size)
         player = pygame.Rect(player_start[0], player_start[1], player_size, player_size)
 
-
-    score = score_font.render(f"Niveau : {level}", 1, violet_clair)
+    meilleur_score = meilleur_score_font.render(f"Record : {getBestScore()}", 1, violet_clair)
+    score = score_font.render(f"Niveau : {level}", 1, violet)
     indications = indications_font.render("Utilisez les flèches pour vous déplacer", 1, violet_clair)
-    screen.blit(score, (screen_width/2.5, 10))
+    screen.blit(meilleur_score, (20, 20))
+    screen.blit(score, (screen_width/2.5, 20))
     screen.blit(indications, (screen_width/3, screen_height - 50))
 
     # Affichage chronomètre
-    chrono = score_font.render('{:02d}:{:02d}'.format(int(minutes), int(seconds)), True, violet_clair)
-    screen.blit(chrono, (screen_width - 150, 10))
+    chrono = meilleur_score_font.render('{:02d}:{:02d}'.format(int(minutes), int(seconds)), True, violet_clair)
+    screen.blit(chrono, (screen_width - 90, 20))
 
     pygame.draw.rect(screen, violet_clair, point_arrivee)
     pygame.draw.ellipse(screen, violet_clair, player)
 
     # Game Over
     if temps_restant <= 0:
+        
+        setScores(level)
 
         player.x = -100
         player.y = -100
