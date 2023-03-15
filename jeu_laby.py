@@ -95,10 +95,17 @@ violet_clair = ("#C957BC")
 orange = ("#FFC872")
 beige = ("#faf0e6")
 
+# Musique d'ambiance
+pygame.mixer.music.load("music.wav")
+pygame.mixer.music.set_volume(0.25)
+pygame.mixer.music.play(-1)
+
+
 # Initialisation de la visibilité des indications sur l'écran Game Over
 visible = True
 clignotant_frequence = 500 # millisecondes
 
+partie_finis = False
 game_over = False
 while not game_over:
 
@@ -153,7 +160,6 @@ while not game_over:
 
     if player.colliderect(point_arrivee):
         # Activation effet son
-        os.getcwd()
         son = pygame.mixer.Sound("new_level.wav")
         son.play()
         
@@ -197,7 +203,16 @@ while not game_over:
     # Game Over
     if temps_restant <= 0:
         
+        # Enregistrer score
         setScores(level)
+
+        if partie_finis == False:
+            # Arrêt musique ambiance
+            pygame.mixer.music.stop()
+
+            # Musique Game Over
+            son_gameover = pygame.mixer.Sound("gameover.wav")
+            son_gameover.play()
 
         player.x = -100
         player.y = -100
@@ -224,8 +239,10 @@ while not game_over:
             visible = False
 
         if visible:
-            # Dessiner le texte sur la surface de jeu
+            # Dessiner le texte sur la surface de jeux
             screen.blit(text_gameover_indications, (screen_width/3, screen_height/2 + 100))
+
+        partie_finis = True
 
 
     #Updating the window
