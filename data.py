@@ -22,6 +22,8 @@ def setScores(newScore:int) :
     gameData["lastScore"] = newScore
     if gameData["bestScore"] == None or newScore > gameData["bestScore"] :
         gameData["bestScore"] = newScore
+    
+    updateFile()
 
 def getBestScore():
     """Getter du meilleur score
