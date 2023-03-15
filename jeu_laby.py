@@ -1,4 +1,4 @@
-import pygame, sys, random, time
+import pygame, sys, random, time, os
 from Maze import Maze
 
 def generateModel(laby, height, width):
@@ -48,6 +48,7 @@ def generateModel(laby, height, width):
 dimension = 8
 laby = Maze.gen_fusion(dimension,dimension)
 maze = generateModel(laby, dimension, dimension)
+
 
 pygame.init()
 pygame.font.init()
@@ -122,7 +123,6 @@ while not game_over:
             if event.key == pygame.K_RIGHT:
                 player.x += block_size
             if event.key == pygame.K_RETURN and temps_restant <= 0:
-                    pygame.display.quit()
                     game_over = True
     
 
@@ -151,6 +151,7 @@ while not game_over:
 
     if player.colliderect(point_arrivee):
         # Activation effet son
+        os.getcwd()
         son = pygame.mixer.Sound("new_level.ogg")
         son.play()
         
