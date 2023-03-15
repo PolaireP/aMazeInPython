@@ -43,10 +43,10 @@ def getLastScore():
     """Getter du dernier score
 
     Returns:
-        str: _description_
+        str: Le dernier score
     """
     if gameData["lastScore"] == None :
-        lastScore = "Aucun score enregistré"
+        lastScore = "Aucun"
     else :
         lastScore = str(gameData["lastScore"])
     
