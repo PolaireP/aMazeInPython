@@ -242,6 +242,11 @@ class Maze:
     def gen_btree(cls, h, w):
         """
         Algorithme de génération de labyrinthe par arbre binaire
+
+        :param cls: La classe Maze
+        :param h: La hauteur du labyrinthe sous forme d'entier
+        :param h: La largeur du labyrinthe sous forme d'entier
+        :return: Un objet Maze représentant le labyrinthe généré
         """
         # Initialisation d'un labyrinthe plein
         maze = cls(h, w, empty = False)
@@ -281,6 +286,11 @@ class Maze:
     def gen_sidewinder(cls, h, w):
         """
         Algorithme de génération sidewinder
+
+        :param cls: La classe Maze
+        :param h: La hauteur du labyrinthe sous forme d'entier
+        :param h: La largeur du labyrinthe sous forme d'entier
+        :return: Un objet Maze représentant le labyrinthe généré
         """
         # Initialisation : création d’un labyrinthe plein
         maze = cls(h, w, empty = False)
@@ -327,6 +337,12 @@ class Maze:
     def gen_fusion(cls, h, w):
         """
         Algorithme de fusion de chemin
+
+        :param cls: La classe Maze
+        :param h: La hauteur du labyrinthe sous forme d'entier
+        :param h: La largeur du labyrinthe sous forme d'entier
+
+        :return: Un objet Maze représentant le labyrinthe généré
         """
         # Initialisation : création d’un labyrinthe plein
         maze = cls(h, w, empty = False)
@@ -535,6 +551,11 @@ class Maze:
     def solve_dfs(self, start, stop):
         """
         Algorithme de résolution parcours en profondeur
+
+        :param start: Tuple représentant la cellule de départ avec ses coordonnées x et y
+        :param stop: Tuple représentant la cellule de départ avec ses coordonnées x et y
+
+        :return: Retourne un chemin de tuple de cellules, représenter sous forme de liste
         """
         
         # Parcours du graphe jusqu’à ce qu’on trouve stop
@@ -585,6 +606,11 @@ class Maze:
     def solve_bfs(self, start, stop):
         """
         Algorithme de résolution parcours en largeur
+
+        :param start: Tuple représentant la cellule de départ avec ses coordonnées x et y
+        :param stop: Tuple représentant la cellule de départ avec ses coordonnées x et y
+        
+        :return: Retourne un chemin de tuple de cellules, représenter sous forme de liste
         """
         
         # Parcours du graphe jusqu’à ce qu’on trouve stop
@@ -695,12 +721,31 @@ class Maze:
         return finalCells
 
 
-    def distance_geo(self, start, stop):
-        chemin = self.solve_dfs(start, stop)
+    def distance_geo(self, c1, c2):
+        """
+        Calcule la distance géodésique entre la cellule c1 et la cellule c2.
+        Cela représente le nombre minimal de déplacements nécessaires sur le graphe pour aller de c1 à c2.
+
+        :param start: Cellule représenter sous forme de tuple qui représente la cellule de départ pour le calcul
+        :param stop: Cellule représenter sous forme de tuple qui représente la cellule d'arrivée pour le calcul
+
+        :return: Distance sous forme d'un entier (nombre de déplacements nécessaires)
+        """
+        chemin = self.solve_dfs(c1, c2)
         return len(chemin)-1
     
     
     def distance_man(self, c1, c2):
+        """
+        Calcule la distance de Manhattan, sur la grille, entre la cellule c1 et la cellule c2, 
+        c’est à dire le nombre minimal de déplacements nécessaires pour aller de c2 à c1 si le 
+        labyrinthe était vide de tout mur.
+
+        :param start: Cellule représenter sous forme de tuple qui représente la cellule de départ pour le calcul
+        :param stop: Cellule représenter sous forme de tuple qui représente la cellule d'arrivée pour le calcul
+        
+        :return: Distance sous forme d'un entier (nombre de déplacements nécessaires)
+        """
         # Calcul distance de Manhattan :
         # d(A,B) = |Xb - Xa| + |Yb - Ya|
         return abs(c2[0] - c1[0]) + abs(c2[1] - c1[1])
