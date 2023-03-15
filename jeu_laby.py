@@ -49,7 +49,7 @@ dimension = 8
 laby = Maze.gen_fusion(dimension,dimension)
 maze = generateModel(laby, dimension, dimension)
 
-
+pygame.mixer.pre_init(44100, -16, 2, 512)
 pygame.init()
 pygame.font.init()
 # Temps
@@ -152,7 +152,7 @@ while not game_over:
     if player.colliderect(point_arrivee):
         # Activation effet son
         os.getcwd()
-        son = pygame.mixer.Sound("new_level.ogg")
+        son = pygame.mixer.Sound("new_level.wav")
         son.play()
         
         # Regeneration map
