@@ -102,6 +102,11 @@ while not game_over:
     # Enregistrement dernière position
     previous_location_player = (player.x, player.y)
 
+    # Lancement du chronomètre
+    temps_ecoule = time.time() - start_time
+    temps_restant = duration - temps_ecoule
+    minutes, seconds = divmod(temps_restant, 60)
+
     #Handling input
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -116,6 +121,9 @@ while not game_over:
                 player.x -= block_size
             if event.key == pygame.K_RIGHT:
                 player.x += block_size
+            if event.key == pygame.K_RETURN and temps_restant <= 0:
+                    pygame.display.quit()
+                    game_over = True
     
 
     # Génération du labyrinthe
@@ -133,10 +141,6 @@ while not game_over:
         wall_x = maze_x
         wall_y += block_size
 
-    # Lancement du chronomètre
-    temps_ecoule = time.time() - start_time
-    temps_restant = duration - temps_ecoule
-    minutes, seconds = divmod(temps_restant, 60)
 
     # Collision mur
     for i in range(len(wall_list)):
@@ -188,13 +192,9 @@ while not game_over:
 
     # Game Over
     if temps_restant <= 0:
+
         player.x = -100
         player.y = -100
-
-        for event in pygame.event.get():
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_RETURN:
-                    game_over = True
 
         game_over_background = pygame.Rect(0, 0, screen_width, screen_height)
         pygame.draw.rect(screen, beige, game_over_background)
