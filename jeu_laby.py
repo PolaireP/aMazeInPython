@@ -46,7 +46,7 @@ def generateModel(laby, height, width):
     return maze
 
 dimension = 8
-laby = Maze.gen_wilson(dimension,dimension)
+laby = Maze.gen_fusion(dimension,dimension)
 maze = generateModel(laby, dimension, dimension)
 
 pygame.init()
@@ -56,7 +56,7 @@ clock = pygame.time.Clock()
 # Initialisation du chronomètre
 start_time = time.time()
 # Estimation du temps
-duration = (laby.distance_geo((0,0), (dimension-1, dimension-1)) * 2) + 2
+duration = (laby.distance_geo((0,0), (dimension-1, dimension-1))) + 2
 
 screen_width = 700
 screen_height = 700
@@ -67,6 +67,7 @@ block_size = 30
 
 score_font = pygame.font.SysFont("roboto", 50)
 indications_font = pygame.font.SysFont("roboto", 20)
+game_over_font = pygame.font.SysFont("roboto", 100)
 
 # Labyrinthe
 maze_lenght = len(maze[0]) * block_size
@@ -84,19 +85,19 @@ player = pygame.Rect(player_start[0], player_start[1], player_size, player_size)
 # Partie
 level = 1
 
-# Musique
-#pygame.mixer.music.load("music.mp3")
-#pygame.mixer.music.set_volume(0.20)
-#pygame.mixer.music.play(-1)
-
-
+# Couleurs
 black = (0,0,0)
 violet = ("#752092")
 violet_clair = ("#C957BC")
 orange = ("#FFC872")
 beige = ("#faf0e6")
 
-while True:
+# Initialisation de la visibilité des indications sur l'écran Game Over
+visible = True
+clignotant_frequence = 500 # millisecondes
+
+game_over = False
+while not game_over:
 
     # Enregistrement dernière position
     previous_location_player = (player.x, player.y)
@@ -137,10 +138,6 @@ while True:
     temps_restant = duration - temps_ecoule
     minutes, seconds = divmod(temps_restant, 60)
 
-    if temps_restant <= 0:
-        print("Le minuteur est terminé.")
-        break
-
     # Collision mur
     for i in range(len(wall_list)):
         if player.colliderect(wall_list[i]):
@@ -149,13 +146,16 @@ while True:
     
 
     if player.colliderect(point_arrivee):
+        # Activation effet son
+        son = pygame.mixer.Sound("new_level.ogg")
+        son.play()
         
         # Regeneration map
         dimension += 1
         level += 1
         while len(maze) * block_size > 0.7 * screen_width:
             block_size -= 1
-        laby = Maze.gen_wilson(dimension,dimension)
+        laby = Maze.gen_fusion(dimension,dimension)
         maze = generateModel(laby, dimension, dimension)
 
         maze_lenght = len(maze[0]) * block_size
@@ -186,7 +186,42 @@ while True:
     pygame.draw.rect(screen, violet_clair, point_arrivee)
     pygame.draw.ellipse(screen, violet_clair, player)
 
+    # Game Over
+    if temps_restant <= 0:
+        player.x = -100
+        player.y = -100
+
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_RETURN:
+                    game_over = True
+
+        game_over_background = pygame.Rect(0, 0, screen_width, screen_height)
+        pygame.draw.rect(screen, beige, game_over_background)
+
+        # Dessiner le texte "Game Over" sur une nouvelle surface
+        text_gameover = game_over_font.render("GAME OVER", True, violet)
+
+        # Centrer le texte sur la surface de jeu
+        text_gameover_position = text_gameover.get_rect(center=(screen_width/2, screen_height/2))
+
+        # Dessiner le texte sur la surface de jeu
+        screen.blit(text_gameover, text_gameover_position)
+
+        # Dessiner les indications
+        text_gameover_indications = indications_font.render("Appuyez sur ENTER pour quitter le jeu", True, violet)
+
+        temps_actuelle = pygame.time.get_ticks()
+        if temps_actuelle % clignotant_frequence < clignotant_frequence // 2:
+            visible = True
+        else:
+            visible = False
+
+        if visible:
+            # Dessiner le texte sur la surface de jeu
+            screen.blit(text_gameover_indications, (screen_width/3, screen_height/2 + 100))
+
 
     #Updating the window
     pygame.display.flip()
-    clock.tick(60)
+    clock.tick(30)
